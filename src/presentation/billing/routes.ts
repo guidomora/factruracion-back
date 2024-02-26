@@ -8,6 +8,7 @@ export class BillingRoutes {
         router.get('/', billingController.getBillings);
         router.post('/', billingController.createBilling);
         router.delete('/:id', billingController.deleteBilling);
+        router.put('/:id', billingController.updateBilling);
         return router;
     }
 }

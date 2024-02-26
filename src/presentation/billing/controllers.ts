@@ -56,4 +56,16 @@ export class BillingController {
         billings.splice(billings.indexOf(bills), 1);
         return res.json({message: 'Billing deleted successfully', bill: bills});
     }
+
+    public updateBilling = async (req:Request, res:Response) => {
+        const {id} = req.params;
+        const {date, price, paid, description} = req.body;
+        const bill = billings.find(bill => bill.id === id);
+        if (!bill) return res.status(404).json({message: 'Billing not found'});
+        bill.date = date || bill.date;
+        bill.price = price || bill.price;
+        bill.paid = paid || bill.paid;
+        bill.description = description || bill.description;
+        return res.json({message: 'Billing updated successfully', bill});
+    }
 }
