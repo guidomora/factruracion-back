@@ -84,7 +84,7 @@ export class BillingController {
                 return res.status(404).json({ message: 'Billing not found' });
             }
 
-            const updateFields: { [key: string]:  Billing } = {};
+            const updateFields: { [key: string]: Billing } = {};
 
             // actualiza los campos, si no viene nada, se queda con el valor original
             updateFields.date = date || bill.date;
@@ -100,5 +100,55 @@ export class BillingController {
             console.error('Error updating billing:', error);
             return res.status(500).json({ message: 'Internal Server Error' });
         }
+    }
+
+    public getBillbyIdOrDescription = async (req: Request, res: Response) => {
+        const { searchTerm } = req.params;
+
+        console.log(searchTerm);
+
+
+        try {
+
+            // const bills = await Bill.find({
+            //     $or: [
+            //         // { id: new RegExp(searchTerm, 'i')  },
+            //         // { description: new RegExp(searchTerm, 'i') },
+            //         // { price: searchTerm },
+            //         {id: {$regex: searchTerm}},
+            //         {description: {$regex: searchTerm}},
+            //         // {price: {$regex: searchTerm}},
+            //     ] 
+            // })
+            const isNumber = !isNaN(parseFloat(searchTerm));
+
+            const queryArray = [];
+    
+            if (isNumber) {
+                queryArray.push({ id: searchTerm });
+            } else {
+                queryArray.push({ id: { $regex: searchTerm} });
+            }
+    
+            queryArray.push({ description: { $regex: searchTerm} });
+    
+            // Agrega esto solo si price es un campo numérico
+            if (isNumber) {
+                queryArray.push({ price: parseFloat(searchTerm) });
+            }
+    
+            const query = { $or: queryArray };
+    
+            const bills = await Bill.find(query);
+
+            if (bills) {
+                res.json(bills);
+            } else {
+                res.status(404).json({ error: 'Facturas no encontradas' });
+            }
+        } catch (error) {
+            console.error('Error updating billing:', error);
+        }
+
     }
 }

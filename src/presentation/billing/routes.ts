@@ -9,6 +9,7 @@ export class BillingRoutes {
         router.post('/', billingController.createBilling);
         router.delete('/:id', billingController.deleteBilling);
         router.put('/:id', billingController.updateBilling);
+        router.get('/search/:searchTerm', billingController.getBillbyIdOrDescription);
         return router;
     }
 }
