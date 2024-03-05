@@ -56,7 +56,7 @@ export class BillingController {
         if (!paid) return res.status(400).json({ message: 'paid is required' });
         if (!description) return res.status(400).json({ message: 'description is required' });
         const newBilling2 = await Bill.create({
-            id,
+            id: id.toUpperCase(),
             date,
             price,
             paid,
