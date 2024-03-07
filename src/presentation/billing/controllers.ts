@@ -105,21 +105,7 @@ export class BillingController {
     public getBillbyIdOrDescription = async (req: Request, res: Response) => {
         const { searchTerm } = req.params;
 
-        console.log(searchTerm);
-
-
         try {
-
-            // const bills = await Bill.find({
-            //     $or: [
-            //         // { id: new RegExp(searchTerm, 'i')  },
-            //         // { description: new RegExp(searchTerm, 'i') },
-            //         // { price: searchTerm },
-            //         {id: {$regex: searchTerm}},
-            //         {description: {$regex: searchTerm}},
-            //         // {price: {$regex: searchTerm}},
-            //     ] 
-            // })
             const isNumber = !isNaN(parseFloat(searchTerm));
 
             const queryArray = [];
