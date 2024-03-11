@@ -1,29 +1,6 @@
 import { Request, Response } from "express";
 import { Bill } from '../../dataSource/models/billModel';
 
-const billings = [
-    {
-        id: "123G",
-        date: '21/02/2024',
-        price: 250000,
-        paid: true,
-        description: 'lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
-    },
-    {
-        id: "123H",
-        date: '28/02/2024',
-        price: 150000,
-        paid: true,
-        description: 'lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
-    },
-    {
-        id: "123I",
-        date: '25/02/2024',
-        price: 50000,
-        paid: false,
-        description: 'lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
-    }
-]
 
 interface Billing {
     id: string;
@@ -109,22 +86,22 @@ export class BillingController {
             const isNumber = !isNaN(parseFloat(searchTerm));
 
             const queryArray = [];
-    
+
             if (isNumber) {
                 queryArray.push({ id: searchTerm });
             } else {
-                queryArray.push({ id: { $regex: searchTerm} });
+                queryArray.push({ id: { $regex: searchTerm } });
             }
-    
-            queryArray.push({ description: { $regex: searchTerm} });
-    
+
+            queryArray.push({ description: { $regex: searchTerm } });
+
             // Agrega esto solo si price es un campo numérico
             if (isNumber) {
                 queryArray.push({ price: parseFloat(searchTerm) });
             }
-    
+
             const query = { $or: queryArray };
-    
+
             const bills = await Bill.find(query);
 
             if (bills) {
@@ -134,6 +111,39 @@ export class BillingController {
             }
         } catch (error) {
             console.error('Error updating billing:', error);
+        }
+
+    }
+
+
+    public getMonthsFromYear = async (req: Request, res: Response) => {
+        const { year } = req.params;
+        const months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+        try {
+            const bills = await Bill.find({ date: { $regex: year } });
+
+            // Inicializar un array para almacenar los totales de cada mes, con una longitud de 12 y todos los valores en 0
+            const monthlyTotals = Array.from({ length: 12 }, () => 0);
+        
+            // Calcular los totales para cada mes
+            bills.forEach(bill => {
+                // el 10 especifica que se debe utilizar el sistema numérico decimal
+                const month = parseInt(bill.date.split('/')[1], 10) - 1; // el -1 es para que el mes 1 sea el índice 0
+                const plainBill = bill.toObject();
+                monthlyTotals[month] += plainBill.price;
+            });
+        
+            // Convertir el array de totales mensuales a un array de objetos
+            const result = months.map((month, index) => ({
+                month,
+                total: monthlyTotals[index],
+            }));
+        
+            res.json(result);
+
+        } catch (error) {
+            console.error('Error getting months:', error);
+            return res.status(500).json({ error });
         }
 
     }

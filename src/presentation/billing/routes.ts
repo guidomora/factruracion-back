@@ -10,6 +10,7 @@ export class BillingRoutes {
         router.delete('/:id', billingController.deleteBilling);
         router.put('/:id', billingController.updateBilling);
         router.get('/search/:searchTerm', billingController.getBillbyIdOrDescription);
+        router.get('/year/:year', billingController.getMonthsFromYear);
         return router;
     }
 }
