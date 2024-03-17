@@ -147,4 +147,28 @@ export class BillingController {
         }
 
     }
+
+    public getTotalFromIdPerson = async (req: Request, res: Response) => {
+        const { id, year } = req.params;
+        const months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+        
+        try {
+            // Buscar todas las facturas que coincidan con el id y el año
+            const idFilter = await Bill.find({id:{$regex:id}, date:{ $regex: year }})
+            const monthlyTotals = Array.from({ length: 12 }, () => 0);
+            idFilter.forEach(bill => {
+                // el 10 especifica que se debe utilizar el sistema numérico decimal
+                const month = parseInt(bill.date.split('/')[1], 10) - 1; // el -1 es para que el mes 1 sea el índice 0
+                const plainBill = bill.toObject();
+                monthlyTotals[month] += plainBill.price;
+            });
+            const result = months.map((month, index) => ({
+                month,
+                total: monthlyTotals[index],
+            }));
+            res.json(result) 
+        } catch (error) {
+            
+        }
+    }
 }
