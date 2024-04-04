@@ -8,9 +8,7 @@ interface ConectOptions {
 export const connect = async (options: ConectOptions) => {
     const { mongoUrl, dbName } = options;
     try {
-        await mongoose.connect(mongoUrl, {
-            dbName,
-        });
+        await mongoose.connect(mongoUrl);
         console.log("Connected to mongoDB");
     } catch (error) {
         console.log("Error connecting to mongoDB", error);
