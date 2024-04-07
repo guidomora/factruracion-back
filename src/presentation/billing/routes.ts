@@ -1,10 +1,12 @@
 import { Router } from "express";
 import { BillingController } from "./controllers";
+import { BillService } from "../service/billService";
 
 export class BillingRoutes {
     static get routes(): Router {
         const router = Router();
-        const billingController = new BillingController();
+        const billingService = new BillService();
+        const billingController = new BillingController(billingService);
         router.get('/', billingController.getBillings);
         router.post('/', billingController.createBilling);
         router.delete('/:id', billingController.deleteBilling);
