@@ -21,6 +21,7 @@ export class BillService {
 
             return {
                 total,
+                limit,
                 next: `/billing?page=${page + 1}&limit=${limit}`,
                 previous: (page-1 > 0) ? `/billing?page=${page - 1}&limit=${limit}` : null,
                 sortedBillings
