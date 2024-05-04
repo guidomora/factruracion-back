@@ -21,7 +21,7 @@ const billSchema = new mongoose.Schema({
         type: String,
         required: true
     }
-
 })
+
 
 export const Bill = mongoose.model('Bill', billSchema);

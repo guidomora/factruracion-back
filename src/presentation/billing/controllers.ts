@@ -18,22 +18,24 @@ export class BillingController {
     ) { }
 
     public getBillings = async (req: Request, res: Response) => {
-        // const billsFromDb = await Bill.find()
-        // const sortedBillings = billsFromDb.sort((a, b) => { // Ordena las facturas por fecha de forma descendente
-        //     const dateA = new Date(a.date.split('/').reverse().join('-')); // Convierte la fecha a un objeto Date
-        //     const dateB = new Date(b.date.split('/').reverse().join('-'));
+        const billsFromDb = await Bill.find()
+        const sortedBillings = billsFromDb.sort((a, b) => { // Ordena las facturas por fecha de forma descendente
+            const dateA = new Date(a.date.split('/').reverse().join('-')); // Convierte la fecha a un objeto Date
+            const dateB = new Date(b.date.split('/').reverse().join('-'));
 
-        //     return dateB.getTime() - dateA.getTime(); // Compara las fechas y devuelve el resultado
-        // });
+            return dateB.getTime() - dateA.getTime(); // Compara las fechas y devuelve el resultado
+        });
 
-        // res.json(sortedBillings);
-        const { page=1, limit=5 } = req.query;
-        const [error, paginationDto] = PaginationDto.create(+page, +limit); // El + convierte el string a number
-        if (error) return res.status(400).json({ error });
+        res.json(sortedBillings);
+        
+        // const { page=1, limit=5 } = req.query;
+        // const [error, paginationDto] = PaginationDto.create(+page, +limit); // El + convierte el string a number
+        
+        // if (error) return res.status(400).json({ error });
 
-        this.billService.getBillings(paginationDto!)
-            .then(result => res.json(result))
-            .catch(error => res.status(500).json({ error }));
+        // this.billService.getBillings(paginationDto!)
+        //     .then(result => res.json(result))
+        //     .catch(error => res.status(500).json({ error }));
     }
 
     public createBilling = async (req: Request, res: Response) => {
