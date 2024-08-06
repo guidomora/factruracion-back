@@ -4,7 +4,7 @@ import { PaginationDto } from "../../Dtos/pagination";
 import { BillService } from "../service/billService";
 
 
-interface Billing {
+export interface Billing {
     id: string;
     date: string;
     price: number;
@@ -18,25 +18,24 @@ export class BillingController {
     ) { }
 
     public getBillings = async (req: Request, res: Response) => {
-        const billsFromDb = await Bill.find()
-        const sortedBillings = billsFromDb.sort((a, b) => { // Ordena las facturas por fecha de forma descendente
-            const dateA = new Date(a.date.split('/').reverse().join('-')); // Convierte la fecha a un objeto Date
-            const dateB = new Date(b.date.split('/').reverse().join('-'));
+        // const billsFromDb = await Bill.find()
+        // const sortedBillings = billsFromDb.sort((a, b) => { // Ordena las facturas por fecha de forma descendente
+        //     const dateA = new Date(a.date.split('/').reverse().join('-')); // Convierte la fecha a un objeto Date
+        //     const dateB = new Date(b.date.split('/').reverse().join('-'));
 
-            return dateB.getTime() - dateA.getTime(); // Compara las fechas y devuelve el resultado
-        });
+        //     return dateB.getTime() - dateA.getTime(); // Compara las fechas y devuelve el resultado
+        // });
 
-        res.json(sortedBillings);
-        
-        // const { page=1, limit=5 } = req.query;
-        // const [error, paginationDto] = PaginationDto.create(+page, +limit); // El + convierte el string a number
-        
-        // if (error) return res.status(400).json({ error });
-
-        // this.billService.getBillings(paginationDto!)
-        //     .then(result => res.json(result))
-        //     .catch(error => res.status(500).json({ error }));
+        // res.json(sortedBillings);
+        const {page = '1', limit = '10'} = req.query
+        try {
+            const bills = await this.billService.getBillingsByPagination(parseInt(page as string), parseInt(limit as string))
+            res.status(200).json(bills)
+        } catch (error) {
+            res.status(500).json({ message: error });
+        }
     }
+
 
     public createBilling = async (req: Request, res: Response) => {
         const { id, date, price, paid, description } = req.body;
@@ -181,7 +180,30 @@ export class BillingController {
             }));
             res.json(result) 
         } catch (error) {
+            return res.status(500).json({ error });
+        }
+    }
+
+    public getBillsByPerson = async (req:Request, res:Response) => {
+        const {personLetter} = req.params
+        const {personDate} = req.query
+        try {
+            const bills = await Bill.find({id:{$regex:personLetter.toUpperCase() }})
+            const perMonth = bills.filter(bill => bill.date.slice(3) == personDate)
             
+            return res.status(200).json(perMonth)
+        } catch (error) {
+            return res.status(500).json({ error });
+        }
+    }
+
+    public getUnpaidData = async (req:Request, res:Response) => {
+        try {
+            const unpaid = await this.billService.unpaidData()
+            return res.status(200).json(unpaid)
+        } catch (error) {
+            return res.status(500).json({ error });
         }
     }
 }
+

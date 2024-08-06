@@ -14,6 +14,8 @@ export class BillingRoutes {
         router.get('/search/:searchTerm', billingController.getBillbyIdOrDescription);
         router.get('/year/:year', billingController.getMonthsFromYear);
         router.get('/personId/:id/:year', billingController.getTotalFromIdPerson)
+        router.get('/byPerson/:personLetter', billingController.getBillsByPerson)
+        router.get('/unpaid', billingController.getUnpaidData)
         return router;
     }
 }
